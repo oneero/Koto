@@ -1,0 +1,139 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://KotoLang/Logger.cs" type="Script" id=1]
+[ext_resource path="res://KotoLang/Testbench.cs" type="Script" id=2]
+[ext_resource path="res://Misc/Fira.tres" type="DynamicFont" id=3]
+
+[sub_resource type="Gradient" id=1]
+
+[sub_resource type="GradientTexture" id=2]
+gradient = SubResource( 1 )
+
+[node name="Node2D" type="Node2D"]
+
+[node name="KotoLogger" type="Node" parent="."]
+script = ExtResource( 1 )
+labelPath = NodePath("../Control/MarginContainer/HSplitContainer/Right/Bot/MarginContainer/ScrollContainer/Label")
+
+[node name="KotoTestbench" type="Node" parent="."]
+script = ExtResource( 2 )
+loggerPath = NodePath("../KotoLogger")
+sourcePath = NodePath("../Control/MarginContainer/HSplitContainer/Left/TextEdit")
+
+[node name="Control" type="Control" parent="."]
+margin_right = 800.0
+margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/margin_right = 10
+custom_constants/margin_top = 10
+custom_constants/margin_left = 10
+custom_constants/margin_bottom = 10
+
+[node name="HSplitContainer" type="HSplitContainer" parent="Control/MarginContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 790.0
+margin_bottom = 590.0
+
+[node name="Left" type="MarginContainer" parent="Control/MarginContainer/HSplitContainer"]
+margin_right = 384.0
+margin_bottom = 580.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Background" type="NinePatchRect" parent="Control/MarginContainer/HSplitContainer/Left"]
+modulate = Color( 0.635294, 0.580392, 1, 1 )
+margin_right = 384.0
+margin_bottom = 580.0
+texture = SubResource( 2 )
+region_rect = Rect2( 2728.63, 127.197, 9.97217, 4.98615 )
+patch_margin_left = 295
+patch_margin_bottom = 95
+
+[node name="TextEdit" type="TextEdit" parent="Control/MarginContainer/HSplitContainer/Left"]
+margin_right = 384.0
+margin_bottom = 580.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/font = ExtResource( 3 )
+text = "(1 + 2) * 3 / 4"
+highlight_current_line = true
+syntax_highlighting = true
+show_line_numbers = true
+breakpoint_gutter = true
+context_menu_enabled = false
+caret_blink = true
+
+[node name="Right" type="VBoxContainer" parent="Control/MarginContainer/HSplitContainer"]
+margin_left = 396.0
+margin_right = 780.0
+margin_bottom = 580.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Top" type="MarginContainer" parent="Control/MarginContainer/HSplitContainer/Right"]
+margin_right = 384.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Button" type="Button" parent="Control/MarginContainer/HSplitContainer/Right/Top"]
+margin_right = 384.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Compile & run"
+
+[node name="Bot" type="MarginContainer" parent="Control/MarginContainer/HSplitContainer/Right"]
+margin_top = 56.0
+margin_right = 384.0
+margin_bottom = 580.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 10.0
+
+[node name="Background2" type="NinePatchRect" parent="Control/MarginContainer/HSplitContainer/Right/Bot"]
+modulate = Color( 0.0352941, 0.0941176, 0.172549, 1 )
+margin_right = 384.0
+margin_bottom = 524.0
+texture = SubResource( 2 )
+region_rect = Rect2( 2728.63, 127.197, 9.97217, 4.98615 )
+patch_margin_left = 295
+patch_margin_bottom = 95
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/MarginContainer/HSplitContainer/Right/Bot"]
+margin_right = 384.0
+margin_bottom = 524.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/margin_right = 10
+custom_constants/margin_top = 10
+custom_constants/margin_left = 10
+custom_constants/margin_bottom = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Control/MarginContainer/HSplitContainer/Right/Bot/MarginContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 374.0
+margin_bottom = 514.0
+scroll_horizontal_enabled = false
+
+[node name="Label" type="Label" parent="Control/MarginContainer/HSplitContainer/Right/Bot/MarginContainer/ScrollContainer"]
+margin_right = 364.0
+margin_bottom = 504.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/font = ExtResource( 3 )
+
+[node name="Viewport" type="Viewport" parent="."]
+size = Vector2( 800, 600 )
+[connection signal="pressed" from="Control/MarginContainer/HSplitContainer/Right/Top/Button" to="KotoTestbench" method="_on_Button_pressed"]
