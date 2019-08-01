@@ -52,7 +52,7 @@
     <Compile Include="KotoLang\Compiler.cs" />
     <Compile Include="KotoLang\Logger.cs" />
     <Compile Include="KotoLang\Chunk.cs" />
-    <Compile Include="KotoLang\Debug.cs" />
+    <Compile Include="KotoLang\Disassembler.cs" />
     <Compile Include="KotoLang\Koto.cs" />
     <Compile Include="KotoLang\Scanner.cs" />
     <Compile Include="KotoLang\Value.cs" />
