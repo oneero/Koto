@@ -100,7 +100,7 @@ public class Compiler
     private void Number()
     {
         double value = Convert.ToDouble(parser.previous.content);
-        EmitConstant(value);
+        EmitConstant(new Value(value));
     }
 
     private void Grouping()
@@ -171,12 +171,12 @@ public class Compiler
         EmitByte(OpCode.RETURN);
     }
 
-    private void EmitConstant(double value)
+    private void EmitConstant(Value value)
     {
         EmitBytes(OpCode.CONSTANT, MakeConstant(value));
     }
 
-    private byte MakeConstant(double value)
+    private byte MakeConstant(Value value)
     {
         int constantIndex = CurrentChunk().AddConstant(value);
         if (constantIndex > MAX_CONSTANT_IN_CHUNK)

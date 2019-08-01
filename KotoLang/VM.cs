@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 //using static Globals.Logger;
 
 public enum InterpretResult
@@ -20,7 +21,7 @@ public class VM
     private byte ip;
 
     //private const int STACK_MAX = 256;
-    private Stack<double> stack;
+    private Stack<Value> stack;
 
     private Compiler compiler;
 
@@ -32,7 +33,7 @@ public class VM
     public VM(Logger logger)
     {
         this.logger = logger;
-        stack = new Stack<double>();
+        stack = new Stack<Value>();
         compiler = new Compiler(logger);
         disassembler = new Disassembler(logger);
     }
@@ -65,40 +66,47 @@ public class VM
             switch(instruction)
             {
                 case OpCode.CONSTANT:
-                    double constant = ReadConstant();
+                    Value constant = ReadConstant();
                     stack.Push(constant);
                     break;
 
                 case OpCode.ADD:
-                    BinaryOp((a, b) => a + b);
+                    if (!BinaryOp((a, b) => a + b))
+                        return InterpretResult.RUNTIME_ERROR;
                     break;
 
                 case OpCode.SUBTRACT:
-                    BinaryOp((a, b) => a - b);
+                    if (!BinaryOp((a, b) => a - b))
+                        return InterpretResult.RUNTIME_ERROR;
                     break;
 
                 case OpCode.MULTIPLY:
-                    BinaryOp((a, b) => a * b);
+                    if (!BinaryOp((a, b) => a * b))
+                        return InterpretResult.RUNTIME_ERROR;
                     break;
 
                 case OpCode.DIVIDE:
-                    BinaryOp((a, b) => a / b);
+                    if (!BinaryOp((a, b) => a / b))
+                        return InterpretResult.RUNTIME_ERROR;
                     break;
 
                 case OpCode.NEGATE:
-                    stack.Push(-stack.Pop());
+                    if (!Peek().IsNumber())
+                    {
+                        RuntimeError("Operand must be a number.");
+                        return InterpretResult.RUNTIME_ERROR;
+                    }
+                    stack.Push(new Value(-stack.Pop().AsNumber()));
                     break;
                 
                 case OpCode.RETURN:
-                    logger.LogPrint("\n=> {0}", stack.Pop());
+                    logger.LogPrint("\n=> {0}", stack.Pop().ToString());
                     return InterpretResult.OK;
 
                 
             }
         }
     }
-
-    // Might be the wrong place for ReadyByte and ReadConstant
 
     private byte ReadByte()
     {
@@ -107,16 +115,36 @@ public class VM
         return instruction;
     }
 
-    private double ReadConstant()
+    private Value ReadConstant()
     {
         int constantIndex =(int)ReadByte();
         return currentChunk.constants[constantIndex];
     }
 
-    private void BinaryOp(Func<double, double, double> op)
+    private bool BinaryOp(Func<double, double, double> op)
     {
-        double b = stack.Pop();
-        double a = stack.Pop();
-        stack.Push(op(a, b));
+        if (!Peek().IsNumber() || !Peek(1).IsNumber())
+        {
+            RuntimeError("Operands must be numbers.");
+            return false; //InterpretResult.RUNTIME_ERROR;
+        }
+        double b = stack.Pop().AsNumber();
+        double a = stack.Pop().AsNumber();
+        stack.Push(new Value(op(a, b)));
+        return true;
+    }
+
+    private void RuntimeError(string msg, params object[] args)
+    {
+        string message = String.Format(msg, args);
+        logger.LogPrint(message);
+        int line = currentChunk.lines[ip];
+        logger.LogPrint("[line {0}] in script.", line);
+    }
+
+    // Utility wrapper for peeking into the stack using Linq
+    private Value Peek(int depth = 0)
+    {
+        return depth == 0 ? stack.Peek() : stack.Skip(depth).First();
     }
 }

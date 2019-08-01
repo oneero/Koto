@@ -18,13 +18,13 @@ public class Chunk
     public int Count { get { return code.Count; } }
 
     // Should use our own class for the values of constants
-    public List<double> constants = null;
+    public List<Value> constants = null;
     public List<int> lines = null;
 
     public Chunk()
     {
         code = new List<byte>();
-        constants = new List<double>();
+        constants = new List<Value>();
         lines = new List<int>();
     }
 
@@ -44,7 +44,7 @@ public class Chunk
         lines.Add(line);
     }
 
-    public int AddConstant(double value)
+    public int AddConstant(Value value)
     {
         constants.Add(value);
         return constants.Count - 1;
