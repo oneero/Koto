@@ -33,14 +33,14 @@ public class Compiler
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_SEMICOLON       
             new ParseRule(null,     Binary,  Precedence.FACTOR),     // TOKEN_SLASH           
             new ParseRule(null,     Binary,  Precedence.FACTOR),     // TOKEN_STAR            
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_BANG            
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_BANG_EQUAL      
+            new ParseRule(Unary,    null,    Precedence.NONE),       // TOKEN_BANG            
+            new ParseRule(null,     Binary,  Precedence.EQUALITY),   // TOKEN_BANG_EQUAL      
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_EQUAL           
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_EQUAL_EQUAL     
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_GREATER         
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_GREATER_EQUAL   
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_LESS            
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_LESS_EQUAL      
+            new ParseRule(null,     Binary,  Precedence.COMPARISON), // TOKEN_EQUAL_EQUAL     
+            new ParseRule(null,     Binary,  Precedence.COMPARISON), // TOKEN_GREATER         
+            new ParseRule(null,     Binary,  Precedence.COMPARISON), // TOKEN_GREATER_EQUAL   
+            new ParseRule(null,     Binary,  Precedence.COMPARISON), // TOKEN_LESS            
+            new ParseRule(null,     Binary,  Precedence.COMPARISON), // TOKEN_LESS_EQUAL      
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_IDENTIFIER      
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_STRING          
             new ParseRule(Number,   null,    Precedence.NONE),       // TOKEN_NUMBER          
@@ -119,6 +119,7 @@ public class Compiler
         // Emit operator instruction
         switch (operatorType)
         {
+            case TokenType.BANG: EmitByte(OpCode.NOT); break;
             case TokenType.MINUS: EmitByte(OpCode.NEGATE); break;
             default:
                 return; // Unreachable.
@@ -137,6 +138,12 @@ public class Compiler
         // Emit the operator instruction.
         switch (operatorType)
         {
+            case TokenType.BANG_EQUAL: EmitBytes(OpCode.EQUAL, OpCode.NOT); break;
+            case TokenType.EQUAL_EQUAL: EmitByte(OpCode.EQUAL); break;
+            case TokenType.GREATER: EmitByte(OpCode.GREATER); break;
+            case TokenType.GREATER_EQUAL: EmitBytes(OpCode.LESS, OpCode.NOT); break; // >= is the same as !(<)
+            case TokenType.LESS: EmitByte(OpCode.LESS); break;
+            case TokenType.LESS_EQUAL: EmitBytes(OpCode.GREATER, OpCode.NOT); break; // <= is the same as !(>)
             case TokenType.PLUS : EmitByte(OpCode.ADD); break;
             case TokenType.MINUS: EmitByte(OpCode.SUBTRACT); break;
             case TokenType.STAR : EmitByte(OpCode.MULTIPLY); break;

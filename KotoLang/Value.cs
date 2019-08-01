@@ -1,13 +1,14 @@
 using Godot;
 using System;
 
-// For now I'll just make this a horrible memory-hog piece of shit and refactor later
-// Might have to go with this in the future..
+// For now I'll just make this a horrible piece of shit and refactor later
+
+// Maybe go with this in the future..?
 // https://stackoverflow.com/questions/3151702/discriminated-union-in-c-sharp
 
 public class Value
 {
-    private ValueType type;
+    public ValueType type;
     private bool boolean;
     private double number;
 

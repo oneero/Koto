@@ -74,6 +74,20 @@ public class VM
                 case OpCode.TRUE: stack.Push(new Value(true)); break;
                 case OpCode.FALSE: stack.Push(new Value(false)); break;
 
+                case OpCode.EQUAL:
+                    EqualityOp();
+                    break;
+                    
+                case OpCode.GREATER:
+                    if (!BinaryOp((a, b) => a > b))
+                        return InterpretResult.RUNTIME_ERROR;
+                    break;
+
+                case OpCode.LESS:
+                    if (!BinaryOp((a, b) => a < b))
+                        return InterpretResult.RUNTIME_ERROR;
+                    break;
+
                 case OpCode.ADD:
                     if (!BinaryOp((a, b) => a + b))
                         return InterpretResult.RUNTIME_ERROR;
@@ -92,6 +106,10 @@ public class VM
                 case OpCode.DIVIDE:
                     if (!BinaryOp((a, b) => a / b))
                         return InterpretResult.RUNTIME_ERROR;
+                    break;
+
+                case OpCode.NOT:
+                    stack.Push(new Value(IsFalsey(stack.Pop())));
                     break;
 
                 case OpCode.NEGATE:
@@ -124,8 +142,15 @@ public class VM
         int constantIndex =(int)ReadByte();
         return currentChunk.constants[constantIndex];
     }
+    
+    private void EqualityOp()
+    {
+        Value b = stack.Pop();
+        Value a = stack.Pop();
+        stack.Push(new Value(ValuesEqual(a, b)));
+    }
 
-    private bool BinaryOp(Func<double, double, double> op)
+    private bool BinaryOp<T>(Func<double, double, T> op)
     {
         if (!Peek().IsNumber() || !Peek(1).IsNumber())
         {
@@ -134,7 +159,23 @@ public class VM
         }
         double b = stack.Pop().AsNumber();
         double a = stack.Pop().AsNumber();
-        stack.Push(new Value(op(a, b)));
+
+        // Have to do runtime conversion to actual value from generic func return
+        // This sucks. Look into making Value completely generic?
+        var genericResult = op(a, b);
+        Value valueResult = null;
+
+        if (typeof(T) == typeof(bool))
+            valueResult = new Value((bool)Convert.ChangeType(genericResult, typeof(bool)));
+        else if (typeof(T) == typeof(double))
+            valueResult = new Value((double)Convert.ChangeType(genericResult, typeof(double)));
+        else
+        {
+            RuntimeError("Binary operation value conversion failed.");
+            return false;
+        }
+
+        stack.Push(valueResult);
         return true;
     }
 
@@ -150,5 +191,24 @@ public class VM
     private Value Peek(int depth = 0)
     {
         return depth == 0 ? stack.Peek() : stack.Skip(depth).First();
+    }
+
+    private bool IsFalsey(Value value)
+    {
+        return value.IsNil() || (value.IsBool() && !value.AsBool());
+    }
+
+    private bool ValuesEqual(Value a, Value b)
+    {
+        if (a.type != b.type) return false;
+
+        switch (a.type)
+        {
+            case ValueType.BOOL:    return a.AsBool() == b.AsBool();
+            case ValueType.NIL:     return true;
+            case ValueType.NUMBER:  return a.AsNumber() == b.AsNumber();
+            default:
+                return false; // Unreachable.
+        }
     }
 }

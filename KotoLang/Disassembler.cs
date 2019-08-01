@@ -46,6 +46,15 @@ public class Disassembler
             case OpCode.FALSE:
                 return SimpleInstruction("OP_FALSE", offset);
 
+            case OpCode.EQUAL:
+                return SimpleInstruction("OP_EQUAL", offset);
+
+            case OpCode.GREATER:
+                return SimpleInstruction("OP_GREATER", offset);
+
+            case OpCode.LESS:
+                return SimpleInstruction("OP_LESS", offset);
+
             case OpCode.ADD:
                 return SimpleInstruction("OP_ADD", offset);
 
@@ -57,6 +66,9 @@ public class Disassembler
 
             case OpCode.DIVIDE:
                 return SimpleInstruction("OP_DIVIDE", offset);
+
+            case OpCode.NOT:
+                return SimpleInstruction("OP_NOT", offset);
 
             case OpCode.NEGATE:
                 return SimpleInstruction("OP_NEGATE", offset);
