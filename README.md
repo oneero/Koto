@@ -5,8 +5,9 @@ A shitty compiler and "toolset" for Koto, a shitty language for controlling deep
 I'm working with with the 64-bit Mono version of the [Godot Engine](https://github.com/godotengine/godot): v3.1.1.stable.mono.official.
 
 Current features:
- * Basic arithmetic with +, -, * and /
  * Grouping with parentheses
+ * Basic arithmetic with +, -, * and /
+ * Logical operations: !, >, <, ==, >= and >=
 
 # How to try?
 Clone the repo and open in Godot I guess? I have not tried.
