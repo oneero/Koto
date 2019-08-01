@@ -47,17 +47,17 @@ public class Compiler
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_AND             
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_CLASS           
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_ELSE            
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_FALSE           
+            new ParseRule(Literal,  null,    Precedence.NONE),       // TOKEN_FALSE           
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_FOR             
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_FUN             
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_IF              
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_NIL             
+            new ParseRule(Literal,  null,    Precedence.NONE),       // TOKEN_NIL             
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_OR              
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_PRINT           
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_RETURN          
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_SUPER           
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_THIS            
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_TRUE            
+            new ParseRule(Literal,  null,    Precedence.NONE),       // TOKEN_TRUE            
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_VAR             
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_WHILE           
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_ERROR           
@@ -141,6 +141,18 @@ public class Compiler
             case TokenType.MINUS: EmitByte(OpCode.SUBTRACT); break;
             case TokenType.STAR : EmitByte(OpCode.MULTIPLY); break;
             case TokenType.SLASH: EmitByte(OpCode.DIVIDE); break;
+            default:
+                return; // Unreachable.
+        }
+    }
+
+    private void Literal()
+    {
+        switch (parser.previous.type)
+        {
+            case TokenType.FALSE: EmitByte(OpCode.FALSE); break;
+            case TokenType.TRUE: EmitByte(OpCode.TRUE); break;
+            case TokenType.NIL: EmitByte(OpCode.NIL); break;
             default:
                 return; // Unreachable.
         }

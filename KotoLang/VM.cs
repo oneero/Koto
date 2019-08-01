@@ -70,6 +70,10 @@ public class VM
                     stack.Push(constant);
                     break;
 
+                case OpCode.NIL: stack.Push(new Value()); break;
+                case OpCode.TRUE: stack.Push(new Value(true)); break;
+                case OpCode.FALSE: stack.Push(new Value(false)); break;
+
                 case OpCode.ADD:
                     if (!BinaryOp((a, b) => a + b))
                         return InterpretResult.RUNTIME_ERROR;

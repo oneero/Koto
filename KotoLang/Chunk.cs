@@ -4,6 +4,9 @@ using System.Collections.Generic;
 public enum OpCode
 {
     CONSTANT,
+    NIL,
+    TRUE,
+    FALSE,
     ADD,
     SUBTRACT,
     MULTIPLY,

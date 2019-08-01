@@ -36,6 +36,15 @@ public class Disassembler
         {
             case OpCode.CONSTANT:
                 return ConstantInstruction("OP_CONSTANT", chunk, offset);
+            
+            case OpCode.NIL:
+                return SimpleInstruction("OP_NIL", offset);
+
+            case OpCode.TRUE:
+                return SimpleInstruction("OP_TRUE", offset);
+
+            case OpCode.FALSE:
+                return SimpleInstruction("OP_FALSE", offset);
 
             case OpCode.ADD:
                 return SimpleInstruction("OP_ADD", offset);

@@ -23,6 +23,11 @@ public class Value
         this.number = number;
     }
 
+    public Value()
+    {
+        this.type = ValueType.NIL;
+    }
+
     public bool AsBool()
     {
         if (IsBool())
