@@ -1,12 +1,15 @@
 # Koto
 A shitty compiler and "toolset" for Koto, a shitty language for controlling deep diving robots (among other things) in a game that does not exist yet.
 
-# Under construction
-It probably does not work.
+# Development
+I'm working with with the 64-bit Mono version of the [Godot Engine](https://github.com/godotengine/godot): v3.1.1.stable.mono.official.
 
 Current features:
  * Basic arithmetic with +, -, * and /
  * Grouping with parentheses
- 
+
+# How to try?
+Clone the repo and open in Godot I guess? I have not tried.
+
 # Big up
 Huge thanks to [@munificent](https://github.com/munificent) for writing [Crafting Interpreters](https://www.craftinginterpreters.com/). It's an excellent book on this subject and the only thing keeping me sane.
