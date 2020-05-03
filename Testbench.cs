@@ -34,11 +34,6 @@ public class Testbench : MonoBehaviour
         RunSource(sourceInput.text);
     }
 
-    private void Repl()
-    {
-
-    }
-
     private void RunFile(string filePath)
     {
         string source = System.IO.File.ReadAllText(@filePath);
@@ -53,8 +48,7 @@ public class Testbench : MonoBehaviour
         source += "\n";
 
         vm = new VM(vmgc, logger);
-
-        //vm.Connect("runFinished", this, nameof(OnRunFinished));
+        
         vm.OnRunFinished.AddListener(OnRunFinished);
 
         if (source != "" && source != null)
