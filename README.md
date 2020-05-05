@@ -2,7 +2,7 @@
 A shitty compiler and "toolset" for Koto, a shitty language for controlling funky exploration robots (among other things) in a game that does not exist yet.
 
 # Development
-This used to be in development for a Godot game but I got tired of that so now it's Unity-compatible instead. The game now being developed in Unity but is not a part of this repository.
+This used to be in development for a Godot game but I got tired of that so now it's Unity-compatible instead. The game is now being developed in Unity but it will not a part of this repository.
 
 Current features:
  * Grouping with parentheses

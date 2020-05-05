@@ -25,6 +25,7 @@ public enum OpCode
     PRINT,
     JUMP,
     JUMP_IF_FALSE,
+    LOOP,
     RETURN,
     WAIT,
     READ,

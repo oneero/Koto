@@ -97,6 +97,9 @@ public class Disassembler
             
             case OpCode.JUMP_IF_FALSE:
                 return JumpInstruction("OP_JUMP_IF_FALSE", 1, chunk, offset);
+            
+            case OpCode.LOOP:
+                return JumpInstruction("OP_LOOP", -1, chunk, offset);
 
             case OpCode.RETURN:
                 return SimpleInstruction("OP_RETURN", offset);

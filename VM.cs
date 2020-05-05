@@ -211,6 +211,11 @@ public class VM
                 if (IsFalsey(Peek(0))) ip += (byte)conditionalJumpOffset;
                 break;
             
+            case OpCode.LOOP:
+                UInt16 loopOffset = ReadShort();
+                ip -= (byte)loopOffset;
+                break;
+            
             case OpCode.RETURN:
                 // Exit
                 return InterpretResult.OK;
@@ -273,8 +278,7 @@ public class VM
     private UInt16 ReadShort()
     {
         ip += 2;
-        // Our bytecode lives in a list so we need a conversion for BitConverter... lame.
-        return BitConverter.ToUInt16(currentChunk.code.ToArray(), ip - 2);
+        return (UInt16)(currentChunk.code[ip - 2] << 8 | currentChunk.code[ip - 1]);
     }
 
     private string ReadString()

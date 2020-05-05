@@ -52,7 +52,7 @@ public class Compiler
             new ParseRule(Variable, null,    Precedence.NONE),       // TOKEN_IDENTIFIER      
             new ParseRule(String,   null,    Precedence.NONE),       // TOKEN_STRING          
             new ParseRule(Number,   null,    Precedence.NONE),       // TOKEN_NUMBER          
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_AND             
+            new ParseRule(null,     And,     Precedence.AND),        // TOKEN_AND             
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_CLASS           
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_ELSE            
             new ParseRule(Literal,  null,    Precedence.NONE),       // TOKEN_FALSE           
@@ -60,7 +60,7 @@ public class Compiler
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_FUN             
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_IF              
             new ParseRule(Literal,  null,    Precedence.NONE),       // TOKEN_NIL             
-            new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_OR              
+            new ParseRule(null,     Or,      Precedence.OR),         // TOKEN_OR              
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_PRINT           
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_RETURN          
             new ParseRule(null,     null,    Precedence.NONE),       // TOKEN_SUPER           
@@ -183,7 +183,7 @@ public class Compiler
     private bool IdentifiersEqual(Token a, Token b)
     {
         if (a.length != b.length) return false; // Quick fail
-        return a == b; // Should this be a.content == b.content ?
+        return a.content == b.content; // Should this be a.content == b.content ?
     }
 
     private int ResolveLocal(Token name)
@@ -217,8 +217,31 @@ public class Compiler
         local.depth = -1; // -1 means uninitialized
     }
 
+    private void And(bool canAssingn)
+    {
+        int endJump = EmitJump(OpCode.JUMP_IF_FALSE);
+        
+        EmitByte(OpCode.POP);
+        ParsePrecedence(Precedence.AND);
+        
+        PatchJump(endJump);
+    }
+
+    private void Or(bool canAssign)
+    {
+        int elseJump = EmitJump(OpCode.JUMP_IF_FALSE);
+        int endJump = EmitJump(OpCode.JUMP);
+        
+        PatchJump(elseJump);
+        EmitByte(OpCode.POP);
+        
+        ParsePrecedence(Precedence.OR);
+        PatchJump(endJump);
+    }
+
     private void DefineVariable(byte global)
     {
+        logger.LogPrint("Defining variable, scopeDepth = {0}", scopeDepth);
         if (scopeDepth > 0)
         {
             MarkInitialized();
@@ -272,9 +295,17 @@ public class Compiler
         {
             SingleArgumentStatement(OpCode.PRINT);
         }
+        else if (Match(TokenType.FOR))
+        {
+            ForStatement();
+        }
         else if (Match(TokenType.IF))
         {
             IfStatement();
+        }
+        else if (Match(TokenType.WHILE))
+        {
+            WhileStatement();
         }
         else if (Match(TokenType.LEFT_BRACE))
         {
@@ -301,6 +332,71 @@ public class Compiler
         Expression();
         Consume(TokenType.SEMICOLON, "Expected ';' after value.");
         EmitByte(OpToEmit);
+    }
+
+    // Initializer clause, condition clause, increment clause
+    private void ForStatement()
+    {
+        // Initializer could declare a variable, which means we need to scope it.
+        BeginScope();
+        
+        Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.");
+        
+        // Initializer clause
+        if (Match(TokenType.SEMICOLON))
+        {
+            // No initializer
+        } else if (Match(TokenType.VAR))
+        {
+           VarDeclaration(); 
+        }
+        else
+        {
+            ExpressionStatement();
+        }
+
+        int loopStart = CurrentChunk().Count;
+        
+        // Condition clause
+        int exitJump = -1;
+        
+        // Check if the clause exists since it's optional
+        if (!Match(TokenType.SEMICOLON))
+        {
+            Expression();
+            Consume(TokenType.SEMICOLON, "Expected ';' after loop condition.");
+            
+            // Jump out if condition is falsey
+            exitJump = EmitJump(OpCode.JUMP_IF_FALSE);
+            EmitByte(OpCode.POP);
+        }
+        
+        // Increment clause
+        if (!Match(TokenType.RIGHT_PAREN))
+        {
+            int bodyJump = EmitJump(OpCode.JUMP);
+            int incrementStart = CurrentChunk().Count;
+            
+            Expression();
+            EmitByte(OpCode.POP);
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after for clauses.");
+            
+            EmitLoop(loopStart);
+            loopStart = incrementStart;
+            PatchJump(bodyJump);
+        }
+        
+        Statement();
+        
+        EmitLoop(loopStart);
+
+        if (exitJump != -1)
+        {
+            PatchJump(exitJump);
+            EmitByte(OpCode.POP);
+        }
+        
+        EndScope();
     }
 
     private void IfStatement()
@@ -333,14 +429,40 @@ public class Compiler
         PatchJump(elseJump);
     }
 
+    private void WhileStatement()
+    {
+        // Capture the point to loop back to
+        int loopStart = CurrentChunk().Count;
+        
+        // Check condition
+        Consume(TokenType.LEFT_PAREN, "Expected '(' after 'while'.");
+        Expression();
+        Consume(TokenType.RIGHT_PAREN, "Expected ')' after condition.");
+
+        // Prepare jump if the condition is falsey
+        int exitJump = EmitJump(OpCode.JUMP_IF_FALSE);
+        
+        EmitByte(OpCode.POP);
+        Statement();
+
+        EmitLoop(loopStart);
+        
+        PatchJump(exitJump);
+        EmitByte(OpCode.POP);
+    }
+
     private void BeginScope()
     {
+        //logger.Log("BeginScope: {0}", scopeDepth);
         scopeDepth++;
+        //logger.LogPrint(" -> {0}", scopeDepth);
     }
 
     private void EndScope()
     {
+        //logger.Log("EndScope: {0}", scopeDepth);
         scopeDepth--;
+        //logger.LogPrint(" -> {0}", scopeDepth);
 
         // Clean up locals of the ended scope
         while (localCount > 0 &&
@@ -473,6 +595,18 @@ public class Compiler
     {
         EmitByte(newByte1);
         EmitByte(newByte2);
+    }
+
+    // Helper function for loops
+    private void EmitLoop(int loopStart)
+    {
+        EmitByte(OpCode.LOOP);
+
+        int offset = CurrentChunk().Count - loopStart + 2;
+        if (offset > UInt16.MaxValue) Error("Loop body too large.");
+        
+        EmitByte((byte)((offset >> 8) & 0xff));
+        EmitByte((byte)(offset & 0xff));
     }
 
     // Helper function for if-statements
