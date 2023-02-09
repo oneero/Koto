@@ -3,7 +3,7 @@ Koto is a programming language, compiler and toolset for controlling funky explo
 
 This project has been on hiatus for several years.
 
-![Koto controlling a dapper little crab-bot in Unity](https://github.com/oneero/Koto/blob/Unity/crabbot.png?raw=true)
+![Koto controlling a dapper little crab-bot in Unity](https://github.com/oneero/Koto/blob/main/crabbot.png?raw=true)
 
 # Development
 The language and toolset was initially developed for Godot, but has since switched to become Unity-compatible instead. 
