@@ -1,5 +1,7 @@
 ﻿# Koto
-Koto is a WIP programming language, compiler and toolset for controlling funky exploration robots (among other things) in a game that does not exist yet.
+Koto is a programming language, compiler and toolset for controlling funky exploration robots (among other things) in a game that does not exist yet.
+
+This project has been on hiatus for several years.
 
 ![Koto controlling a dapper little crab-bot in Unity](https://github.com/oneero/Koto/blob/Unity/crabbot.png?raw=true)
 
