@@ -1,8 +1,10 @@
 ﻿# Koto
-A shitty compiler and "toolset" for Koto, a shitty language for controlling funky exploration robots (among other things) in a game that does not exist yet.
+Koto is a WIP programming language, compiler and toolset for controlling funky exploration robots (among other things) in a game that does not exist yet.
+
+![Koto controlling a dapper little crab-bot in Unity](https://github.com/oneero/Koto/blob/Unity/crabbot.png?raw=true)
 
 # Development
-This used to be in development for a Godot game but I got tired of that so now it's Unity-compatible instead. The game is now being developed in Unity but it will not be a part of this repository.
+The language and toolset was initially developed for Godot, but has since switched to become Unity-compatible instead. 
 
 Current features:
  * Grouping with parentheses
@@ -16,7 +18,7 @@ Current features:
  * While and for loops
 
 # How to try?
-Throw it in a Unity project and start poking around. Connect a GUI to the Testbench script to compile and interpret user inputs. Adapt VMGC to tie in your game logic and plug it in the Testbench as well.
+The Testbench script connects GUI elements and runs user inputs on the VM. The VM has opcodes for interfacing with the VMGC. The VMGC is intended to interface with the rest of the game logic.
 
 # Big up
-Huge thanks to [@munificent](https://github.com/munificent) for writing [Crafting Interpreters](https://www.craftinginterpreters.com/). It's an excellent book on this subject and the only thing keeping me sane.
+Huge thanks to [@munificent](https://github.com/munificent) for writing [Crafting Interpreters](https://www.craftinginterpreters.com/). It's an excellent book on this subject and I highly recommend it to everyone!
